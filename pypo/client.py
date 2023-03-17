@@ -741,7 +741,8 @@ class PortfolioOptimizer:
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
         benchmark_equity_curve = self._generate_benchmark_equity_curve(benchmark,start_equity,backtest.index.min(),backtest.index.max())
-        backtest = backtest.join(benchmark_equity_curve.to_frame(),how='left').ffill().bfill()
+        backtest = backtest.join(benchmark_equity_curve.to_frame(),how='left')
+        backtest['benchmark_equity_curve'] = backtest['benchmark_equity_curve'].ffill().bfill()
 
         return backtest
     
