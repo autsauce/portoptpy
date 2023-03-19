@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.1.0",
     author="Maddox Southard",
     author_email="maddoxsouthard@yahoo.com",
-    description="A Python library for interfacing with the Portfolio Optimizer API.",
+    description="A Python library for interfacing with the Portfolio Optimizer API: https://docs.portfoliooptimizer.io/",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/autsauce/portoptpy",
