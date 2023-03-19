@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pypo",
+    name="portfoliooptimizer",
     version="0.1.0",
     author="Maddox Southard",
     author_email="maddoxsouthard@yahoo.com",
