@@ -1,3 +1,3 @@
 __version__ = "0.1.0"
-name = "portoptpy"
-from portoptpy.client import PortfolioOptimizer
+from .client import PortfolioOptimizer
+__all__ = ['PortfolioOptimizer']
