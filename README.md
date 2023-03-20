@@ -10,7 +10,7 @@ A Python library for interfacing with and conducting backtests using the Portfol
 For backtesting, the library utilizes asyncio and aiohttp to make concurrent calls to the Portfolio Optimizer API which significantly improves the speed of conducting backtests.
 
 ### Installation
-```
+```python
 pip install portoptpy
 ```
 
@@ -18,19 +18,19 @@ pip install portoptpy
 An API key is not required to use the Portfolio Optimizer API, however, authenticated users get full access to all endpoints more favorable API limits. Using this library for backtesting purposes will likely require an API key which can be obtained here: https://www.buymeacoffee.com/portfolioopt
 
 ### Usage
-```
+```python
 from portoptpy import PortfolioOptimizer
 
 po = PortfolioOptimizer(api_key = 'YOUR_API_KEY')
 ```
 
 Performing a single minimum variance portfolio optimization using a 63 day lookback period for calculating the covaraince matrix:
-```
+```python
 portfolio = po.construct_minimum_variance_portfolio(symbols = ['SPY','TLT','GLD','BTC-USD'], lookback = 63)
 ```
 
 Backtesting an equal risk contributions portfolio using an exponentially weighted covariance matrix with decay factor of 0.95:
-```
+```python
 backtest = po.backtest_equal_risk_contributions_portfolio(symbols = ['SPY','TLT','GLD','BTC-USD'],
                                                                     lookback = 63,
                                                                     covariance_type = 'exponential',
