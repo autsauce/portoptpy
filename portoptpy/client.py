@@ -2,6 +2,7 @@ from typing import List, Dict, Any
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import warnings
 import requests
 import aiohttp
 import asyncio
@@ -124,24 +125,25 @@ class PortfolioOptimizer:
             return False
 
         if not isinstance(returns, pd.DataFrame):
-            print('Warning: The data passed for returns is not a pandas DataFrame. Defaulting to Yahoo Finance for returns data.')
+            warnings.warn('The data passed for returns is not a pandas DataFrame. Defaulting to Yahoo Finance for returns data.')
             return False
 
         if not set(symbols).issubset(set(returns.columns)):
-            print('Warning: The symbols passed do not all exist in the DataFrame columns that was provided for returns. Defaulting to Yahoo Finance for returns data.')
+            warnings.warn('The symbols passed do not all exist in the DataFrame columns that was provided for returns. Defaulting to Yahoo Finance for returns data.')
             return False
 
         if len(returns) < lookback:
-            print('Warning: The DataFrame that was provided for returns does not have enough rows for the specified lookback period. Defaulting to Yahoo Finance for returns data.')
+            warnings.warn('The DataFrame that was provided for returns does not have enough rows for the specified lookback period. Defaulting to Yahoo Finance for returns data.')
             return False
 
         for col in returns.columns.tolist():
             non_nan_values = returns[col].dropna()
             if len(non_nan_values) < lookback:
-                print('Warning: The DataFrame provided for returns does not have enough non-NaN values in each column for the specified lookback period. Defaulting to Yahoo Finance for returns data.')
+                warnings.warn('The DataFrame provided for returns does not have enough non-NaN values in each column for the specified lookback period. Defaulting to Yahoo Finance for returns data.')
                 return False
 
         return True
+
 
     def _get_position_history(self, symbols: List[str], lookback: int, frequency: str = 'month_start', method: str = 'any', returns: pd.DataFrame = None) -> pd.DataFrame:
                     """
