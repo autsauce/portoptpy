@@ -6,7 +6,7 @@ import requests
 import aiohttp
 import asyncio
 
-class PortfolioOptimizer():
+class PortfolioOptimizer:
     """A class to handle portfolio optimization using the Portfolio Optimizer API."""
 
     def __init__(self, api_key: str = None):
