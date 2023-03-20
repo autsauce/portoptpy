@@ -23,7 +23,10 @@ portfolio = po.construct_minimum_variance_portfolio(symbols = ['SPY','TLT','GLD'
 
 Backtesting an equal risk contributions portfolio using an exponentially weighted covariance matrix with decay factor of 0.95:
 ```
-backtest = po.backtest_equal_risk_contributions_portfolio(symbols = ['SPY','TLT','GLD','BTC-USD'], lookback = 63, covariance_type = 'exponential', decay_factor = 0.95)
+backtest = po.backtest_equal_risk_contributions_portfolio(symbols = ['SPY','TLT','GLD','BTC-USD'],
+                                                                    lookback = 63,
+                                                                    covariance_type = 'exponential',
+                                                                    decay_factor = 0.95)
 
 backtest[['portfolio_equity_curve','benchmark_equity_curve']].plot()
 ```
