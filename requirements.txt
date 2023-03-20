@@ -1,6 +1,6 @@
-yfinance
-requests
+numpy
+pandas
 aiohttp
 asyncio
-pandas
-numpy
+requests
+yfinance
