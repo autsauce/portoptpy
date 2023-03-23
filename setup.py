@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="portoptpy",
-    version='0.1.6',
+    version='0.1.7',
     author="Maddox Southard",
     author_email="maddoxsouthard@yahoo.com",
     description="A Python library for interfacing with the Portfolio Optimizer API: https://docs.portfoliooptimizer.io/",
