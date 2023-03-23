@@ -661,7 +661,8 @@ class PortfolioOptimizer:
                                                          start_equity: float = 100000,
                                                          benchmark: str = 'SPY',
                                                          fee: float = 0.0,
-                                                         returns: pd.DataFrame = None) -> pd.DataFrame:
+                                                         returns: pd.DataFrame = None,
+                                                         position_history: pd.DataFrame = None) -> pd.DataFrame:
         """
         Backtests an equal risk contributions portfolio over a specified period.
 
@@ -683,6 +684,8 @@ class PortfolioOptimizer:
         :type returns: pd.DataFrame, optional
         :param date_asset_pair_list: A list of tuples containing dates and their respective asset lists. Defaults to None.
         :type date_asset_pair_list: List[Tuple[List[str], str]], optional
+        :param position_history: A DataFrame containing the position history of the portfolio. Defaults to None.
+        :type position_history: pd.DataFrame, optional
         :return: DataFrame with portfolio data for each period.
         :rtype: pd.DataFrame
         """
@@ -730,7 +733,8 @@ class PortfolioOptimizer:
         if not self._validate_returns_format(returns, symbols, lookback):
             returns = self._get_asset_returns(symbols, lookback)
 
-        position_history = self._get_position_history(symbols, lookback, frequency, method)
+        if position_history is None:
+            position_history = self._get_position_history(symbols, lookback, frequency, method)
 
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
@@ -758,7 +762,8 @@ class PortfolioOptimizer:
                                                         start_equity: float = 100000,
                                                         benchmark: str = 'SPY',
                                                         fee: float = 0.0,
-                                                        returns: pd.DataFrame = None) -> pd.DataFrame:
+                                                        returns: pd.DataFrame = None,
+                                                        position_history: pd.DataFrame = None) -> pd.DataFrame:
         """
         Backtests a hierarchical risk parity portfolio over a specified period.
 
@@ -780,6 +785,8 @@ class PortfolioOptimizer:
         :type returns: pd.DataFrame, optional
         :param date_asset_pair_list: A list of tuples containing dates and their respective asset lists. Defaults to None.
         :type date_asset_pair_list: List[Tuple[List[str], str]], optional
+        :param position_history: A DataFrame containing the position history of the portfolio. Defaults to None.
+        :type position_history: pd.DataFrame, optional
         :return: DataFrame with portfolio data for each period.
         :rtype: pd.DataFrame
         """
@@ -827,7 +834,8 @@ class PortfolioOptimizer:
         if not self._validate_returns_format(returns, symbols, lookback):
             returns = self._get_asset_returns(symbols, lookback)
 
-        position_history = self._get_position_history(symbols, lookback, frequency, method)
+        if position_history is None:
+            position_history = self._get_position_history(symbols, lookback, frequency, method)
 
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
@@ -854,7 +862,8 @@ class PortfolioOptimizer:
                                                     start_equity: float = 100000,
                                                     benchmark: str = 'SPY',
                                                     fee: float = 0.0,
-                                                    returns: pd.DataFrame = None) -> pd.DataFrame:
+                                                    returns: pd.DataFrame = None,
+                                                    position_history: pd.DataFrame = None) -> pd.DataFrame:
         """
         Backtests a hierarchical risk parity clustering-based portfolio over a specified period.
 
@@ -876,6 +885,8 @@ class PortfolioOptimizer:
         :type returns: pd.DataFrame, optional
         :param date_asset_pair_list: A list of tuples containing dates and their respective asset lists. Defaults to None.
         :type date_asset_pair_list: List[Tuple[List[str], str]], optional
+        :param position_history: A DataFrame containing the position history of the portfolio. Defaults to None.
+        :type position_history: pd.DataFrame, optional
         :return: DataFrame with portfolio data for each period.
         :rtype: pd.DataFrame
         """
@@ -923,7 +934,8 @@ class PortfolioOptimizer:
         if not self._validate_returns_format(returns, symbols, lookback):
             returns = self._get_asset_returns(symbols, lookback)
 
-        position_history = self._get_position_history(symbols, lookback, frequency, method)
+        if position_history is None:
+            position_history = self._get_position_history(symbols, lookback, frequency, method)
 
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
@@ -950,7 +962,8 @@ class PortfolioOptimizer:
                                                     start_equity: float = 100000,
                                                     benchmark: str = 'SPY',
                                                     fee: float = 0.0,
-                                                    returns: pd.DataFrame = None) -> pd.DataFrame:
+                                                    returns: pd.DataFrame = None,
+                                                    position_history: pd.DataFrame = None) -> pd.DataFrame:
         """
         Backtests a most diversified portfolio over a specified period.
 
@@ -972,6 +985,8 @@ class PortfolioOptimizer:
         :type returns: pd.DataFrame, optional
         :param date_asset_pair_list: A list of tuples containing dates and their respective asset lists. Defaults to None.
         :type date_asset_pair_list: List[Tuple[List[str], str]], optional
+        :param position_history: A DataFrame containing the position history of the portfolio. Defaults to None.
+        :type position_history: pd.DataFrame, optional
         :return: DataFrame with portfolio data for each period.
         :rtype: pd.DataFrame
         """
@@ -1019,7 +1034,8 @@ class PortfolioOptimizer:
         if not self._validate_returns_format(returns, symbols, lookback):
             returns = self._get_asset_returns(symbols, lookback)
 
-        position_history = self._get_position_history(symbols, lookback, frequency, method)
+        if position_history is None:
+            position_history = self._get_position_history(symbols, lookback, frequency, method)
 
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
@@ -1046,7 +1062,8 @@ class PortfolioOptimizer:
                                                     start_equity: float = 100000,
                                                     benchmark: str = 'SPY',
                                                     fee: float = 0.0,
-                                                    returns: pd.DataFrame = None) -> pd.DataFrame:
+                                                    returns: pd.DataFrame = None,
+                                                    position_history: pd.DataFrame = None) -> pd.DataFrame:
         """
         Backtests a minimum variance portfolio over a specified period.
 
@@ -1068,6 +1085,8 @@ class PortfolioOptimizer:
         :type returns: pd.DataFrame, optional
         :param date_asset_pair_list: A list of tuples containing dates and their respective asset lists. Defaults to None.
         :type date_asset_pair_list: List[Tuple[List[str], str]], optional
+        :param position_history: A DataFrame containing the position history of the portfolio. Defaults to None.
+        :type position_history: pd.DataFrame, optional
         :return: DataFrame with portfolio data for each period.
         :rtype: pd.DataFrame
         """
@@ -1115,7 +1134,8 @@ class PortfolioOptimizer:
         if not self._validate_returns_format(returns, symbols, lookback):
             returns = self._get_asset_returns(symbols, lookback)
 
-        position_history = self._get_position_history(symbols, lookback, frequency, method)
+        if position_history is None:
+            position_history = self._get_position_history(symbols, lookback, frequency, method)
 
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
