@@ -212,6 +212,78 @@ class PortfolioOptimizer:
 
                     return df
 
+    def _get_momentum_position_history(self, symbols: List[str], mom_lookback: List[int], num_positions: int, frequency: str = 'month_start', method: str = 'any', returns: pd.DataFrame = None) -> pd.DataFrame:
+                    """
+                    Returns a DataFrame containing the position history of the given symbols, filtered by lookback and returns DataFrame.
+
+                    :param symbols: List of stock symbols.
+                    :type symbols: List[str]
+                    :param mom_lookback: A list of lookback periods (in months) to use for calculating the momentum.
+                    :type mom_lookback: List[int]
+                    :param num_positions: The number of positions to hold at each rebalance.
+                    :type num_positions: int
+                    :param returns: DataFrame containing historical returns of the symbols.
+                    :type returns: pd.DataFrame
+                    :return: DataFrame containing the position history of the given symbols.
+                    :rtype: pd.DataFrame
+                    """
+                    # Get asset prices
+                    prices = self._get_asset_prices(symbols)
+
+                    # Calculate momentum weights
+                    r = range(1, len(mom_lookback) + 1)
+                    mom_weights = [(i / sum(r)) * 10 for i in r]
+                    mom_weights.reverse()
+
+                    # Calculate momentum percentage changes
+                    pcts = [prices.shift(1).pct_change(int(p * 21)) for p in mom_lookback]
+                    pcts = sum([pcts[i] * mom_weights[i] for i in range(len(mom_lookback))]) / 10
+                    momentums = pcts[symbols]
+
+                    # Create position history DataFrame
+                    if method == 'any':
+                        df = [[index] + row.dropna().sort_values(ascending=False).head(num_positions).index.tolist() for index, row in momentums.iterrows() if row.dropna().shape[0] >= num_positions]
+                    elif method == 'all':
+                        df = [[index] + row.dropna().sort_values(ascending=False).head(num_positions).index.tolist() for index, row in momentums.iterrows() if row.dropna().shape[0] == momentums.shape[1]]
+                    df = pd.DataFrame(df)
+                    df.columns = ['date'] + [f'position_{i + 1}' for i in range(df.shape[1] - 1)]
+                    df.set_index('date', inplace=True)
+
+                    frequencies = {'week_start': 'W-MON',
+                                    'week_end': 'W-FRI',
+                                    'month_start': 'MS',
+                                    'month_end': 'M',
+                                    'quarter_start': 'QS-JAN',
+                                    'quarter_end': 'QS-DEC',
+                                    'year_start': 'AS-JAN',
+                                    'year_end': 'AS-DEC'}
+
+                    freq = frequencies.get(frequency)
+
+                    if frequency == 'day':
+                        rebalance_days = df.index.tolist()
+
+                    elif 'end' in frequency:
+                        date_range = pd.date_range(df.index.min(),df.index.max(),freq=freq)
+                        rebalance_days = []
+
+                        for i in range(0,len(date_range)):
+                            rebalance_days.append(df.loc[:date_range[i]].index.max())
+
+                    elif 'start' in frequency:
+                        date_range = pd.date_range(df.index.min(),df.index.max(),freq=freq)
+                        rebalance_days = []
+
+                        for i in range(0,len(date_range)):
+                            rebalance_days.append(df.loc[date_range[i]:].index.min())
+
+                    else:
+                        raise ValueError('Invalid frequency. Valid frequencies are: day, week_start, week_end, month_start, month_end, quarter_start, quarter_end, year_start, year_end.')
+
+                    df = df.loc[rebalance_days]
+
+                    return df
+
     def _generate_portfolio_equity_curve(self,weights_history: pd.DataFrame, returns: pd.DataFrame, start_equity: float = 100000, fee: float = 0.0) -> pd.DataFrame:
         """
         Generates the equity curve for a portfolio given its weights history and returns data.
@@ -226,9 +298,7 @@ class PortfolioOptimizer:
         pd.DataFrame: A dataframe containing the equity curve for the portfolio.
         """
         
-        symbols = weights_history[[c for c in weights_history.columns if c.startswith('position_')]].unstack().unique().tolist()
-        symbols = [s for s in symbols if s is not None]
-        n = len(symbols)
+        n = weights_history[[c for c in weights_history.columns if c.startswith('position_')]].shape[1]
         rebalance_days = weights_history.index.tolist()
 
         df = returns.index.to_frame().set_index('date').join(weights_history,how='left').loc[weights_history.index.min():].ffill()
@@ -736,13 +806,15 @@ class PortfolioOptimizer:
         if position_history is None:
             position_history = self._get_position_history(symbols, lookback, frequency, method)
 
+        n = position_history.shape[1]
+
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
         tasks = [_call_optimization_function(symbols, returns.shift(1).loc[:date]) for date, symbols in date_symbol_pair_list]
         results = await asyncio.gather(*tasks)
 
         weights = pd.DataFrame(results, index=position_history.index).fillna(0.0)
-        weights.columns = [f'weight_{i + 1}' for i in range(len(symbols))]
+        weights.columns = [f'weight_{i + 1}' for i in range(n)]
         weights_history = pd.concat([position_history,weights],axis=1)
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
@@ -837,13 +909,15 @@ class PortfolioOptimizer:
         if position_history is None:
             position_history = self._get_position_history(symbols, lookback, frequency, method)
 
+        n = position_history.shape[1]
+
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
         tasks = [_call_optimization_function(symbols, returns.shift(1).loc[:date]) for date, symbols in date_symbol_pair_list]
         results = await asyncio.gather(*tasks)
 
         weights = pd.DataFrame(results, index=position_history.index).fillna(0.0)
-        weights.columns = [f'weight_{i + 1}' for i in range(len(symbols))]
+        weights.columns = [f'weight_{i + 1}' for i in range(n)]
         weights_history = pd.concat([position_history,weights],axis=1)
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
@@ -937,13 +1011,15 @@ class PortfolioOptimizer:
         if position_history is None:
             position_history = self._get_position_history(symbols, lookback, frequency, method)
 
+        n = position_history.shape[1]
+
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
         tasks = [_call_optimization_function(symbols, returns.shift(1).loc[:date]) for date, symbols in date_symbol_pair_list]
         results = await asyncio.gather(*tasks)
 
         weights = pd.DataFrame(results, index=position_history.index).fillna(0.0)
-        weights.columns = [f'weight_{i + 1}' for i in range(len(symbols))]
+        weights.columns = [f'weight_{i + 1}' for i in range(n)]
         weights_history = pd.concat([position_history,weights],axis=1)
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
@@ -1037,13 +1113,15 @@ class PortfolioOptimizer:
         if position_history is None:
             position_history = self._get_position_history(symbols, lookback, frequency, method)
 
+        n = position_history.shape[1]
+
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
         tasks = [_call_optimization_function(symbols, returns.shift(1).loc[:date]) for date, symbols in date_symbol_pair_list]
         results = await asyncio.gather(*tasks)
 
         weights = pd.DataFrame(results, index=position_history.index).fillna(0.0)
-        weights.columns = [f'weight_{i + 1}' for i in range(len(symbols))]
+        weights.columns = [f'weight_{i + 1}' for i in range(n)]
         weights_history = pd.concat([position_history,weights],axis=1)
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
@@ -1137,13 +1215,15 @@ class PortfolioOptimizer:
         if position_history is None:
             position_history = self._get_position_history(symbols, lookback, frequency, method)
 
+        n = position_history.shape[1]
+
         date_symbol_pair_list = [(date,symbols.dropna().tolist()) for date,symbols in position_history.iterrows()]
 
         tasks = [_call_optimization_function(symbols, returns.shift(1).loc[:date]) for date, symbols in date_symbol_pair_list]
         results = await asyncio.gather(*tasks)
 
         weights = pd.DataFrame(results, index=position_history.index).fillna(0.0)
-        weights.columns = [f'weight_{i + 1}' for i in range(len(symbols))]
+        weights.columns = [f'weight_{i + 1}' for i in range(n)]
         weights_history = pd.concat([position_history,weights],axis=1)
 
         backtest = self._generate_portfolio_equity_curve(weights_history, returns, start_equity, fee)
