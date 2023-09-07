@@ -1,6 +1,6 @@
 # portoptpy
 ### About
-A Python library for interfacing with and conducting backtests using the Portfolio Optimizer API: https://docs.portfoliooptimizer.io/. All portfolio optimization methodologies require the historical returns of the portfolio's constiutent assets. By default, the library will obtain daily returns data from Yahoo finance for performing optimizations. ***BEWARE OF LOOK-AHEAD BIAS WHEN USING BACKWARD ADJUSTED PRICES*** Users can utilize their own returns data as long as it is passed in with the proper format:
+A Python library for interfacing with and conducting backtests using the Portfolio Optimizer API: https://docs.portfoliooptimizer.io/. All portfolio optimization methodologies require the historical returns of the portfolio's constiutent assets. By default, the library will obtain daily returns data from Yahoo finance for performing optimizations. ***BEWARE OF LOOK-AHEAD BIAS WHEN USING BACKWARD ADJUSTED PRICES.*** Users can utilize their own returns data as long as it is passed in with the proper format:
 
 1. Must be a pandas DataFrame.
 2. Column indices must be ticker symbols.
